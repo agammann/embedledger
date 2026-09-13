@@ -6,7 +6,7 @@ Date: September 13, 2026.
 
 The implementation was exercised on Windows amd64 using the official Go 1.27.1 toolchain. The downloaded toolchain archive was verified against the SHA256 digest published by go.dev.
 
-`go test -count=1 -coverprofile=coverage.out ./...` passed. The main CLI package reported 83.3 percent statement coverage. The example application is exercised separately rather than by its own unit tests.
+`go test -count=1 -coverprofile=coverage.out ./...` passed. The main CLI package reported 83.1 percent statement coverage after adding the partial package selection check. The example application is exercised separately rather than by its own unit tests.
 
 `go vet ./...` passed. The bundled HTML asset resolved to 112 bytes and SHA256 `eb1f3865d429` as its displayed hash prefix. A snapshot followed by a check for Linux amd64 completed successfully.
 
@@ -19,7 +19,7 @@ The implementation was exercised on Windows amd64 using the official Go 1.27.1 t
 5. Added files, removed files, and changes with the same byte count produce diffs.
 6. A compiled CLI returns process status 0 for a match, 1 for drift, and 2 for a malformed baseline.
 7. Checking preserves the baseline; overwriting requires an explicit force option.
-8. Different scan scopes, missing packages, invalid embed patterns, cancellation, and exceeded byte budgets fail without reporting a complete scan.
+8. Different scan scopes, missing packages (including a mixture of valid and unmatched patterns), invalid embed patterns, cancellation, and exceeded byte budgets fail without reporting a complete scan.
 9. Invalid, duplicate, or inconsistent baseline records are rejected.
 10. An embedded baseline is rejected to prevent a circular hash comparison.
 11. Escaping symlinks are rejected by the rooted file API, on systems where the test process may create symlinks.
@@ -27,5 +27,11 @@ The implementation was exercised on Windows amd64 using the official Go 1.27.1 t
 ## CI evidence
 
 The [GitHub Actions workflow](https://github.com/agammann/embedledger/actions/workflows/ci.yml) is the authoritative record for remote Linux, Windows, macOS, and race detector results. The workflow also checks the committed example inventory.
+
+[Initial published revision c5fa79a](https://github.com/agammann/embedledger/actions/runs/34783332928) passed all four CI jobs. A subsequent change rejects partially matched package selections and passed the local suite again; its remote results are available in the workflow history.
+
+## Installation and publication
+
+A fresh consumer installation with `go install github.com/agammann/embedledger@latest` retrieved revision `c5fa79a` through the Go module proxy. The installed executable printed version 0.1.0 and successfully checked the committed example baseline. Publication was read back through Git, and the remote tree matched the reviewed local tree. The public repository and rendered README were also checked in GitHub's browser UI.
 
 Local cross compilation does not establish that a binary ran on that operating system. Consult the corresponding CI job for execution evidence. These checks are functional validation, not an exhaustive security audit.

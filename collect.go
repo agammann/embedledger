@@ -81,6 +81,9 @@ func goCommand(ctx context.Context, dir string, env []string, args ...string) ([
 	if err := cmd.Run(); err != nil {
 		return nil, fmt.Errorf("go %s: %w: %s", args[0], err, strings.TrimSpace(stderr.String()))
 	}
+	if args[0] == "list" && strings.Contains(stderr.String(), "matched no packages") {
+		return nil, fmt.Errorf("incomplete package selection: %s", strings.TrimSpace(stderr.String()))
+	}
 	return out.Bytes(), nil
 }
 

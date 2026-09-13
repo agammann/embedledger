@@ -120,6 +120,10 @@ func TestNoPartialSuccess(t *testing.T) {
 	if _, err := collect(context.Background(), opt); err == nil {
 		t.Fatal("no packages must fail")
 	}
+	opt.Patterns = []string{".", "./missing/..."}
+	if _, err := collect(context.Background(), opt); err == nil {
+		t.Fatal("a valid package must not hide an unmatched package pattern")
+	}
 	opt.Patterns = []string{"./../..."}
 	if _, err := collect(context.Background(), opt); err == nil {
 		t.Fatal("parent traversal must fail")
