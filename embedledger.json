@@ -1,0 +1,24 @@
+{
+  "schema": 1,
+  "go_version": "go1.27.1",
+  "scope": {
+    "goos": "linux",
+    "goarch": "amd64",
+    "cgo": "0",
+    "tags": [],
+    "tests": false,
+    "packages": [
+      "./..."
+    ]
+  },
+  "assets": [
+    {
+      "package": "github.com/agammann/embedledger/examples/site",
+      "kind": "production",
+      "path": "examples/site/assets/index.html",
+      "bytes": 112,
+      "sha256": "eb1f3865d42969e1874bfa319d9f133da7bf01f1d3a99451db041398ffce07cc"
+    }
+  ],
+  "total_bytes": 112
+}
