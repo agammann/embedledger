@@ -28,10 +28,12 @@ The implementation was exercised on Windows amd64 using the official Go 1.27.1 t
 
 The [GitHub Actions workflow](https://github.com/agammann/embedledger/actions/workflows/ci.yml) is the authoritative record for remote Linux, Windows, macOS, and race detector results. The workflow also checks the committed example inventory.
 
-[Initial published revision c5fa79a](https://github.com/agammann/embedledger/actions/runs/34783332928) passed all four CI jobs. A subsequent change rejects partially matched package selections and passed the local suite again; its remote results are available in the workflow history.
+[Initial published revision c5fa79a](https://github.com/agammann/embedledger/actions/runs/34783332928) passed all four CI jobs. [Revision 0514ca6](https://github.com/agammann/embedledger/actions/runs/34783450415), which also rejects partially matched package selections, passed all four jobs: Windows, Linux, macOS, and the Linux race detector.
 
 ## Installation and publication
 
-A fresh consumer installation with `go install github.com/agammann/embedledger@latest` retrieved revision `c5fa79a` through the Go module proxy. The installed executable printed version 0.1.0 and successfully checked the committed example baseline. Publication was read back through Git, and the remote tree matched the reviewed local tree. The public repository and rendered README were also checked in GitHub's browser UI.
+A fresh consumer installation with `go install github.com/agammann/embedledger@latest` retrieved revision `c5fa79a` through the Go module proxy. Installation of the subsequent exact revision `0514ca6933a2fd24b80124832ce57b9767c16595` was also verified. The installed executable printed version 0.1.0 and successfully checked the committed example baseline. Publication was read back through Git, and the remote tree matched the reviewed local tree. The public repository and rendered README were also checked in GitHub's browser UI.
+
+The version 0.1.0 release packages this implementation with installation instructions and a changelog. Tagged installation uses `go install github.com/agammann/embedledger@v0.1.0`. Go 1.27 or newer must be installed and remain on PATH when using the tool.
 
 Local cross compilation does not establish that a binary ran on that operating system. Consult the corresponding CI job for execution evidence. These checks are functional validation, not an exhaustive security audit.

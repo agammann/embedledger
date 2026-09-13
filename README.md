@@ -22,9 +22,11 @@ One Go binary. Standard library only. No account, service, or configuration lang
 Requires Go 1.27 or newer. The Go command must remain on PATH when running EmbedLedger because it resolves the actual embed inputs.
 
 ```sh
-go install github.com/agammann/embedledger@latest
+go install github.com/agammann/embedledger@v0.1.0
 embedledger version
 ```
+
+Version 0.1.0 is the first release. See the [release notes](https://github.com/agammann/embedledger/releases/tag/v0.1.0) and [changelog](CHANGELOG.md). Use `@latest` instead of `@v0.1.0` to install the newest published version.
 
 Or build the checkout:
 
