@@ -1,5 +1,17 @@
 # Changelog
 
+## 0.1.1
+
+Released September 19, 2026.
+
+- Preserve Go subprocess cancellation and deadline errors instead of returning an unexplained process failure.
+- Add `--timeout` to scan, snapshot, and check. The default remains one minute, with positive durations up to one hour supported. Timeout errors now suggest a concrete retry.
+- Add regression coverage for cancellation, timeout recovery, and invalid durations.
+- Rewrite installation and quick start directions, and add command, troubleshooting, and GitHub Actions guides.
+- Record compatibility checks against pinned Glamour, Goose, and Mods checkouts, including independently checked hashes, drift, restoration, and resource limits.
+
+The baseline format is unchanged. Existing 0.1.0 baselines remain compatible when their build scope matches.
+
 ## 0.1.0
 
 Released September 13, 2026.

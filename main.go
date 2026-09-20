@@ -13,7 +13,7 @@ import (
 	"time"
 )
 
-const version = "0.1.0"
+const version = "0.1.1"
 
 func main() { os.Exit(run(os.Args[1:], os.Stdout, os.Stderr)) }
 
@@ -52,6 +52,7 @@ Exit codes: 0 success, 1 inventory drift, 2 invalid input or incomplete scan.`)
 	file := fs.String("file", "embedledger.json", "baseline path, relative to --dir")
 	asJSON := fs.Bool("json", false, "print structured JSON")
 	force := fs.Bool("force", false, "allow snapshot to replace an existing baseline")
+	timeout := fs.Duration("timeout", time.Minute, "scan deadline, for example 60s or 5m (maximum 1h)")
 	if err := fs.Parse(args[1:]); err != nil {
 		if errors.Is(err, flag.ErrHelp) {
 			return 0
@@ -62,8 +63,12 @@ Exit codes: 0 success, 1 inventory drift, 2 invalid input or incomplete scan.`)
 		fmt.Fprintln(errOut, "--force is only valid for snapshot")
 		return 2
 	}
+	if *timeout <= 0 || *timeout > time.Hour {
+		fmt.Fprintln(errOut, "--timeout must be greater than zero and at most 1h")
+		return 2
+	}
 	opt.Patterns = fs.Args()
-	ctx, cancel := context.WithTimeout(context.Background(), 60*time.Second)
+	ctx, cancel := context.WithTimeout(context.Background(), *timeout)
 	defer cancel()
 	var previous manifest
 	if command == "check" {
@@ -77,6 +82,9 @@ Exit codes: 0 success, 1 inventory drift, 2 invalid input or incomplete scan.`)
 	current, err := collect(ctx, opt)
 	if err != nil {
 		fmt.Fprintln(errOut, err)
+		if errors.Is(err, context.DeadlineExceeded) {
+			fmt.Fprintln(errOut, "scan timed out; retry with a longer --timeout (for example --timeout 5m), or select fewer packages")
+		}
 		return 2
 	}
 	if command != "scan" {

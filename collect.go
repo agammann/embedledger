@@ -79,6 +79,9 @@ func goCommand(ctx context.Context, dir string, env []string, args ...string) ([
 	stderr := &boundedBuffer{limit: 64 << 10}
 	cmd.Stdout, cmd.Stderr = out, stderr
 	if err := cmd.Run(); err != nil {
+		if ctx.Err() != nil {
+			return nil, fmt.Errorf("go %s interrupted: %w", args[0], ctx.Err())
+		}
 		return nil, fmt.Errorf("go %s: %w: %s", args[0], err, strings.TrimSpace(stderr.String()))
 	}
 	if args[0] == "list" && strings.Contains(stderr.String(), "matched no packages") {

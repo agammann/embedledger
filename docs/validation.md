@@ -1,5 +1,7 @@
 # Validation
 
+For the September 19, 2026 version 0.1.1 compatibility checks and timeout fix, see [real project validation](real-world-validation.md). The record below describes the original release.
+
 Date: September 13, 2026.
 
 ## Local evidence
