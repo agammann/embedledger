@@ -1,5 +1,23 @@
 # Validation
 
+## Consumer installation review on October 2, 2026
+
+The documented `go install github.com/agammann/embedledger@v0.1.1` installation succeeded in a fresh Go workspace on Windows amd64. The executable reported `embedledger 0.1.1`. The official Go 1.27.1 archive was checked against the SHA256 published by go.dev before use.
+
+Both that installed release and a binary built from source revision `1e5c6cfb2ca3dabbe7dc871fa7e52388f2996452` passed actual CLI checks:
+
+- The committed example baseline matched at 112 bytes. File sizes and SHA256 hashes agreed with an independent calculation, and `go run ./examples/site` printed the HTML.
+- In disposable modules with spaces in their paths, snapshot creation and unchanged checks exited with 0. A second snapshot without `--force` was rejected without replacing the baseline.
+- Same-size content changes, additions, and removals exited with 1 and produced the expected JSON records. Checking preserved the saved baseline byte for byte.
+- `snapshot --force` accepted a reviewed change, and the next check matched.
+- An exceeded byte budget, expired deadline, and malformed baseline exited with 2 and produced no successful JSON report. A normal scan after the expired deadline succeeded.
+
+`go test -count=1 ./...`, `go vet ./...`, and the build passed. Thirteen top-level tests passed; the escaping-symlink test skipped because this Windows process could not create symlinks. Go formatting was clean. The [existing source CI run](https://github.com/agammann/embedledger/actions/runs/35480528191) passed Windows, Linux, macOS, and the Linux race detector; this review's local execution was Windows only.
+
+No application changes were needed. The September real-project checks below remain historical evidence and were not repeated in this review.
+
+## Earlier verification
+
 For the September 19, 2026 version 0.1.1 compatibility checks and timeout fix, see [real project validation](real-world-validation.md). The record below describes the original release.
 
 Date: September 13, 2026.
