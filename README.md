@@ -126,4 +126,4 @@ The race detector needs a supported platform and C compiler. [Repository CI](.gi
 
 ## License
 
-A license has not yet been selected. Public repository visibility does not include an open source license grant.
+EmbedLedger is licensed under the [MIT License](LICENSE).
