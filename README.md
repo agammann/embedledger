@@ -15,15 +15,15 @@ One Go CLI, standard library only. No account or service required.
 Install [Go 1.27 or newer](https://go.dev/doc/install), then check that `go version` works in your terminal. Go must remain on PATH because EmbedLedger uses its resolver when scanning your project.
 
 ```sh
-go install github.com/agammann/embedledger@v0.1.1
+go install github.com/agammann/embedledger@v1.0.0
 embedledger version
 ```
 
-Expected output: `embedledger 0.1.1`.
+Expected output: `embedledger 1.0.0`.
 
-If your terminal cannot find `embedledger`, follow the [PATH setup instructions](docs/troubleshooting.md#command-not-found). This release is installed from source through Go; it does not include prebuilt binary downloads.
+If your terminal cannot find `embedledger`, follow the [PATH setup instructions](docs/troubleshooting.md#command-not-found). Prebuilt native ZIP packages are also available from the release page. Download the package matching your OS and architecture, verify its SHA256 checksum, and unpack it. Each package includes the CLI, MIT license, documentation, and the checked example. Go 1.27 or newer must remain on PATH when using either installation method.
 
-See the [0.1.1 release](https://github.com/agammann/embedledger/releases/tag/v0.1.1) and [changelog](CHANGELOG.md). Use `@latest` instead of `@v0.1.1` when you want the newest tagged version.
+See the [1.0.0 release](https://github.com/agammann/embedledger/releases/tag/v1.0.0) and [changelog](CHANGELOG.md). Use `@latest` instead of `@v1.0.0` when you want the newest tagged version.
 
 ## Quick start
 
@@ -120,9 +120,13 @@ go vet ./...
 go test -race ./...
 ```
 
-The race detector needs a supported platform and C compiler. [Repository CI](.github/workflows/ci.yml) runs the real resolver and CLI tests on Windows, Linux, and macOS, plus the Linux race detector.
+The race detector needs a supported platform and C compiler. [Repository CI](https://github.com/agammann/embedledger/blob/v1.0.0/.github/workflows/ci.yml) runs the real resolver and CLI tests on Windows, Linux, and macOS, plus the Linux race detector.
 
 [Real project checks](docs/real-world-validation.md) · [Validation record](docs/validation.md) · [Research and related work](docs/research.md)
+
+## Compatibility and upgrades
+
+Version 1.x preserves the documented commands, flags and defaults, exit codes, and schema-1 baseline fields. Existing 0.1.1 baselines remain compatible when their build scope matches; upgrading does not require a new snapshot. See the [stability and upgrade contract](docs/compatibility.md) before updating automation.
 
 ## License
 
