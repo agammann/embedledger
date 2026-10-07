@@ -8,6 +8,7 @@ Released October 6, 2026.
 - Include documentation and the checked example in each package. Go 1.27 or newer remains required on PATH for asset resolution.
 - Verify each native package after unpacking on Windows, Linux, and macOS before publishing it.
 - Define the 1.x compatibility contract for documented commands, flags, exit codes, and schema-1 baselines.
+- Resolve filesystem aliases consistently when comparing Go package directories with the module root, including macOS temporary directories.
 
 The baseline format is unchanged. Existing 0.1.1 baselines remain compatible when their build scope matches. Upgrade the executable, keep the same scan options, and run `check`; a new snapshot is not required.
 

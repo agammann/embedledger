@@ -4,12 +4,14 @@ import (
 	"bytes"
 	"context"
 	"encoding/json"
+	"errors"
 	"os"
 	"os/exec"
 	"path/filepath"
 	"runtime"
 	"slices"
 	"strings"
+	"syscall"
 	"testing"
 )
 
@@ -68,6 +70,38 @@ func TestGoResolverSemantics(t *testing.T) {
 				t.Fatal("inventory is not deterministic")
 			}
 		})
+	}
+}
+
+func TestGoResolverThroughModuleAlias(t *testing.T) {
+	dir, opt := fixture(t, "assets")
+	alias := filepath.Join(t.TempDir(), "module")
+	if err := os.Symlink(dir, alias); err != nil {
+		// Windows ERROR_PRIVILEGE_NOT_HELD: symlink creation needs permission.
+		if runtime.GOOS == "windows" && errors.Is(err, syscall.Errno(1314)) {
+			t.Skipf("symlink privilege unavailable: %v", err)
+		}
+		t.Fatal(err)
+	}
+	opt.Dir = alias
+	// Unix Go subprocesses may retain a valid PWD alias in package metadata.
+	t.Setenv("PWD", alias)
+	m, err := collect(context.Background(), opt)
+	if err != nil {
+		t.Fatal(err)
+	}
+	if len(m.Assets) != 2 || m.TotalBytes != 9 || m.Assets[0].Path != "assets/a.txt" || m.Assets[1].Path != "assets/nested/b.txt" {
+		t.Fatalf("unexpected inventory through module alias: %+v", m)
+	}
+	// A package alias that resolves outside the module must still fail.
+	outside := t.TempDir()
+	writeFixture(t, outside, "outside.go", "package outside\n")
+	if err := os.Symlink(outside, filepath.Join(dir, "outside")); err != nil {
+		t.Fatal(err)
+	}
+	opt.Patterns = []string{"./outside"}
+	if _, err := collect(context.Background(), opt); err == nil || !strings.Contains(err.Error(), "outside the selected module") {
+		t.Fatalf("expected outside-module rejection, got %v", err)
 	}
 }
 
