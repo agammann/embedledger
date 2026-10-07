@@ -2,11 +2,16 @@ name: CI
 
 on:
   push:
+    branches: [main]
   pull_request:
   workflow_dispatch:
 
 permissions:
   contents: read
+
+concurrency:
+  group: embedledger-${{ github.workflow }}-${{ github.ref }}
+  cancel-in-progress: false
 
 jobs:
   verify:
@@ -33,6 +38,17 @@ jobs:
       - name: Require Go formatting
         shell: bash
         run: test -z "$(gofmt -l .)"
+      - name: Build and verify native distribution
+        run: go run ./scripts/package
+      - name: Keep verified native distribution
+        uses: actions/upload-artifact@ea165f8d65b6e75b540449e92b4886f43607fa02 # v4
+        with:
+          name: embedledger-native-${{ runner.os }}-${{ runner.arch }}
+          path: |
+            dist/embedledger_*.zip
+            dist/embedledger_*.zip.sha256
+          if-no-files-found: error
+          overwrite: true
 
   race:
     name: Race detector
@@ -44,3 +60,28 @@ jobs:
           go-version: '1.27.1'
           cache: false
       - run: go test -race -count=1 ./...
+
+  publish:
+    name: Publish verified release
+    needs: [verify, race]
+    if: github.event_name == 'push' && github.ref == 'refs/heads/main'
+    runs-on: ubuntu-latest
+    permissions:
+      contents: write
+    concurrency:
+      group: embedledger-release
+      cancel-in-progress: false
+    steps:
+      - uses: actions/checkout@11d5960a326750d5838078e36cf38b85af677262 # v4
+      - name: Read packages from this verified run
+        uses: actions/download-artifact@d3f86a106a0bac45b974a628896c90dbdf5c8093 # v4
+        with:
+          pattern: embedledger-native-*
+          path: release-artifacts
+          merge-multiple: true
+      - name: Publish complete packages
+        uses: actions/github-script@ed597411d8f924073f98dfc5c65a23a2325f34cd # v8
+        with:
+          script: |
+            const publish = require('./scripts/release.cjs');
+            await publish({ github, context, core });

@@ -192,7 +192,13 @@ func collect(ctx context.Context, opt options) (manifest, error) {
 		if pkg.ForTest != "" {
 			continue
 		}
-		dir, err := filepath.Rel(root, pkg.Dir)
+		// Go can report another filesystem alias for the same directory.
+		// Resolve it, as we did the module root, before checking containment.
+		packageDir, err := filepath.EvalSymlinks(pkg.Dir)
+		if err != nil {
+			return m, fmt.Errorf("resolve package %q directory: %w", pkg.ImportPath, err)
+		}
+		dir, err := filepath.Rel(root, packageDir)
 		if err != nil || !filepath.IsLocal(dir) {
 			return m, fmt.Errorf("package %q is outside the selected module", pkg.ImportPath)
 		}

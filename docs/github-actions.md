@@ -40,7 +40,7 @@ jobs:
       - name: Prepare project dependencies
         run: go mod download
       - name: Install EmbedLedger
-        run: go install github.com/agammann/embedledger@v0.1.1
+        run: go install github.com/agammann/embedledger@v1.0.0
       - name: Check reviewed embedded assets
         run: embedledger check --goos linux --goarch amd64 --max-bytes 10485760 --timeout 5m
 ```
