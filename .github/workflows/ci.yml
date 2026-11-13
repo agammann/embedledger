@@ -22,8 +22,8 @@ jobs:
         os: [ubuntu-latest, windows-latest, macos-latest]
     runs-on: ${{ matrix.os }}
     steps:
-      - uses: actions/checkout@11d5960a326750d5838078e36cf38b85af677262 # v4
-      - uses: actions/setup-go@924ae3a1cded613372ab5595356fb5720e22ba16 # v6
+      - uses: actions/checkout@3d3c42e5aac5ba805825da76410c181273ba90b1 # v7.0.1
+      - uses: actions/setup-go@b7ad1dad31e06c5925ef5d2fc7ad053ef454303e # v7.0.0
         with:
           go-version: '1.27.1'
           cache: false
@@ -41,7 +41,7 @@ jobs:
       - name: Build and verify native distribution
         run: go run ./scripts/package
       - name: Keep verified native distribution
-        uses: actions/upload-artifact@ea165f8d65b6e75b540449e92b4886f43607fa02 # v4
+        uses: actions/upload-artifact@cf430e030ddbb5b0abf93d22962f4752f3646cd9 # v7.0.2
         with:
           name: embedledger-native-${{ runner.os }}-${{ runner.arch }}
           path: |
@@ -54,12 +54,83 @@ jobs:
     name: Race detector
     runs-on: ubuntu-latest
     steps:
-      - uses: actions/checkout@11d5960a326750d5838078e36cf38b85af677262 # v4
-      - uses: actions/setup-go@924ae3a1cded613372ab5595356fb5720e22ba16 # v6
+      - uses: actions/checkout@3d3c42e5aac5ba805825da76410c181273ba90b1 # v7.0.1
+      - uses: actions/setup-go@b7ad1dad31e06c5925ef5d2fc7ad053ef454303e # v7.0.0
         with:
           go-version: '1.27.1'
           cache: false
       - run: go test -race -count=1 ./...
+
+  verify-transferred-packages:
+    name: Verify transferred packages
+    if: github.event_name == 'pull_request'
+    needs: [verify, race]
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/checkout@3d3c42e5aac5ba805825da76410c181273ba90b1 # v7.0.1
+      - uses: actions/setup-go@b7ad1dad31e06c5925ef5d2fc7ad053ef454303e # v7.0.0
+        with:
+          go-version: '1.27.1'
+          cache: false
+      - name: Download packages from this verified run
+        uses: actions/download-artifact@9000827ccba6bdab643e8b6fd33ac0654aef8333 # v8.0.2
+        with:
+          pattern: embedledger-native-*
+          path: release-artifacts
+          merge-multiple: true
+      - name: Check checksums and run the Linux package
+        shell: bash
+        run: |
+          set -euo pipefail
+          version="$(go run . version | cut -d ' ' -f 2)"
+          cd release-artifacts
+          shopt -s nullglob
+          files=(*)
+          archives=(embedledger_"${version}"_*.zip)
+          mac=(embedledger_"${version}"_darwin_*.zip)
+          test "${#files[@]}" -eq 6
+          test "${#archives[@]}" -eq 3
+          test "${#mac[@]}" -eq 1
+          case "${mac[0]}" in
+            "embedledger_${version}_darwin_amd64.zip"|"embedledger_${version}_darwin_arm64.zip") ;;
+            *) exit 1 ;;
+          esac
+          test -f "embedledger_${version}_linux_amd64.zip"
+          test -f "embedledger_${version}_windows_amd64.zip"
+          for archive in "${archives[@]}"; do
+            test -f "${archive}.sha256"
+            sha256sum "$archive" | cmp - "${archive}.sha256"
+          done
+          mkdir consumer
+          unzip -q "embedledger_${version}_linux_amd64.zip" -d consumer
+          cd "consumer/embedledger_${version}_linux_amd64"
+          test "$(./embedledger version)" = "embedledger ${version}"
+          ./embedledger check --goos linux --goarch amd64
+      - name: Exercise the published-release guard without external writes
+        uses: actions/github-script@3a2844b7e9c422d3c10d287c895573f7108da1b3 # v9.0.0
+        with:
+          script: |
+            const fs = require('node:fs');
+            const publish = require('./scripts/release.cjs');
+            const match = fs.readFileSync('main.go', 'utf8').match(/^const version = "([^"]+)"\r?$/m);
+            if (!match) throw new Error('Version not found');
+            const listReleases = () => { throw new Error('Unexpected direct call'); };
+            const mockGithub = {
+              rest: { repos: { listReleases } },
+              paginate: async fn => {
+                if (fn !== listReleases) throw new Error('Unexpected pagination');
+                return [{ tag_name: 'v' + match[1], draft: false }];
+              },
+            };
+            const messages = [];
+            await publish({
+              github: mockGithub,
+              context: { eventName: 'push', ref: 'refs/heads/main', sha: '0'.repeat(40), repo: { owner: 'fixture', repo: 'fixture' } },
+              core: { info: message => messages.push(message) },
+            });
+            if (!messages.some(message => message.includes('already published; leaving it unchanged'))) {
+              throw new Error('Published-release guard did not run');
+            }
 
   publish:
     name: Publish verified release
@@ -72,15 +143,15 @@ jobs:
       group: embedledger-release
       cancel-in-progress: false
     steps:
-      - uses: actions/checkout@11d5960a326750d5838078e36cf38b85af677262 # v4
+      - uses: actions/checkout@3d3c42e5aac5ba805825da76410c181273ba90b1 # v7.0.1
       - name: Read packages from this verified run
-        uses: actions/download-artifact@d3f86a106a0bac45b974a628896c90dbdf5c8093 # v4
+        uses: actions/download-artifact@9000827ccba6bdab643e8b6fd33ac0654aef8333 # v8.0.2
         with:
           pattern: embedledger-native-*
           path: release-artifacts
           merge-multiple: true
       - name: Publish complete packages
-        uses: actions/github-script@ed597411d8f924073f98dfc5c65a23a2325f34cd # v8
+        uses: actions/github-script@3a2844b7e9c422d3c10d287c895573f7108da1b3 # v9.0.0
         with:
           script: |
             const publish = require('./scripts/release.cjs');
