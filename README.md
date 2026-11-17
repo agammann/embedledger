@@ -12,18 +12,40 @@ One Go CLI, standard library only. No account or service required.
 
 ## Install
 
-Install [Go 1.27 or newer](https://go.dev/doc/install), then check that `go version` works in your terminal. Go must remain on PATH because EmbedLedger uses its resolver when scanning your project.
+Install [Go 1.27 or newer](https://go.dev/doc/install), then check that `go version` works in your terminal. Use a current patch release; this version is verified with Go 1.27.4. Go must remain on PATH because EmbedLedger uses its resolver when scanning your project.
 
 ```sh
-go install github.com/agammann/embedledger@v1.0.0
+go install github.com/agammann/embedledger@v1.0.1
 embedledger version
 ```
 
-Expected output: `embedledger 1.0.0`.
+Expected output: `embedledger 1.0.1`.
 
 If your terminal cannot find `embedledger`, follow the [PATH setup instructions](docs/troubleshooting.md#command-not-found). Prebuilt native ZIP packages are also available from the release page. Download the package matching your OS and architecture, verify its SHA256 checksum, and unpack it. Each package includes the CLI, MIT license, documentation, and the checked example. Go 1.27 or newer must remain on PATH when using either installation method.
 
-See the [1.0.0 release](https://github.com/agammann/embedledger/releases/tag/v1.0.0) and [changelog](CHANGELOG.md). Use `@latest` instead of `@v1.0.0` when you want the newest tagged version.
+See the [1.0.1 release](https://github.com/agammann/embedledger/releases/tag/v1.0.1) and [changelog](CHANGELOG.md). Use `@latest` instead of `@v1.0.1` when you want the newest tagged version.
+
+### Start from a native ZIP
+
+After verifying and unpacking the ZIP, open a terminal in the extracted package directory containing `go.mod`, `embedledger.json`, and the executable. You can check its bundled example without changing PATH.
+
+On macOS or Linux:
+
+```sh
+./embedledger version
+./embedledger check --goos linux --goarch amd64
+```
+
+On Windows PowerShell:
+
+```powershell
+.\embedledger.exe version
+.\embedledger.exe check --goos linux --goarch amd64
+```
+
+The check reports `Embedded assets match the baseline (112 bytes).` Go must still be on PATH. The target flags select the example's recorded build scope; the executable itself must match your operating system and architecture.
+
+The commands below use `embedledger` from PATH. If you keep the unpacked CLI outside PATH, use its explicit path in each command and `--dir` to select your project's module root. See [native package troubleshooting](docs/troubleshooting.md#native-zip-installation).
 
 ## Quick start
 
@@ -120,7 +142,7 @@ go vet ./...
 go test -race ./...
 ```
 
-The race detector needs a supported platform and C compiler. [Repository CI](https://github.com/agammann/embedledger/blob/v1.0.0/.github/workflows/ci.yml) runs the real resolver and CLI tests on Windows, Linux, and macOS, plus the Linux race detector.
+The race detector needs a supported platform and C compiler. [Repository CI](https://github.com/agammann/embedledger/blob/v1.0.1/.github/workflows/ci.yml) runs the real resolver and CLI tests on Windows, Linux, and macOS, plus the Linux race detector.
 
 [Real project checks](docs/real-world-validation.md) · [Validation record](docs/validation.md) · [Research and related work](docs/research.md)
 

@@ -1,5 +1,17 @@
 # Validation
 
+## Native package onboarding review on November 17, 2026
+
+The starting source was `172e4ca8ba6052dacf707f20c800a9b2e2720fd2`. Its CLI, documentation and example matched the published 1.0.0 release; only two CI files differed. The source built with Go 1.27.1 and its native Linux ZIP was byte identical to the actual published package. A fresh `go install github.com/agammann/embedledger@v1.0.0` also succeeded in an isolated workspace.
+
+Actual CLI verification used only disposable local modules and asset files. Source, installed and published native executables completed the documented 112 byte example, snapshot and unchanged checks, added/removed/same-size changed assets, explicit forced replacement, resource errors and malformed baseline handling. Matches, drift and errors returned 0, 1 and 2 respectively. Existing baselines stayed unchanged during checks, and restoring the owned fixture returned to a match. No target program, generator, account, provider or external system was exercised.
+
+The native ZIP's executable was not on PATH in a clean environment. Direct `./embedledger` invocation from its extracted module root worked. This exposed a gap in the primary installation guide, which previously left unpacked users with bare commands. Version 1.0.1 adds direct commands, explains the included `go.mod` example root and separates native ZIP usage from `go install` PATH setup. Only the CLI version constant changes in application source; commands, scan behavior, defaults, exit codes and schema-1 baselines remain unchanged.
+
+The candidate uses Go 1.27.4 for builds and CI, retaining the Go 1.27 source minimum. The official `golang:1.27.4` image was pinned by digest `sha256:205c7636d74e0ffbe3d007162df7d74f859f5a8c8322dfb9f907977686c126cf`. With networking disabled and source mounted read only, all 15 top-level tests, vet, formatting and the race detector passed. The existing packager built a CGO-disabled Linux executable and verified its unpacked version, help and 112 byte example. The two additional packages have no test files; no individual test was skipped.
+
+Browser-independent CLI verification of the actual candidate ZIP confirmed its checksum, paths, CRC and executable mode, then ran the copied native instructions and the same fictional workflow with Go 1.27.4. A module path containing spaces also worked with `--dir`. The candidate executable SHA256 was `a3fc9cb35bac15c130ba2fa4c8205c86ecd8a68a61837311500793519946131e`; later record-only documentation edits do not change that executable. Local Windows/macOS execution is not claimed. Exact-commit cross-platform CI, transferred packages and public release acceptance remain separate delivery evidence.
+
 ## Consumer installation review on October 2, 2026
 
 The documented `go install github.com/agammann/embedledger@v0.1.1` installation succeeded in a fresh Go workspace on Windows amd64. The executable reported `embedledger 0.1.1`. The official Go 1.27.1 archive was checked against the SHA256 published by go.dev before use.
