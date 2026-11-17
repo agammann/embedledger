@@ -65,7 +65,7 @@ func run() error {
 	if err = build.Run(); err != nil {
 		return fmt.Errorf("build native executable: %w", err)
 	}
-	files := []string{"LICENSE", "README.md", "CHANGELOG.md", "go.mod", "embedledger.json"}
+	files := []string{"LICENSE", "GO-LICENSE.txt", "README.md", "CHANGELOG.md", "go.mod", "embedledger.json"}
 	for _, directory := range []string{"docs", "examples"} {
 		err = filepath.WalkDir(directory, func(path string, entry fs.DirEntry, walkErr error) error {
 			if walkErr != nil {
@@ -103,6 +103,16 @@ func run() error {
 	}
 	packageRoot := filepath.Join(unpacked, name)
 	program := filepath.Join(packageRoot, executable)
+	for _, notice := range []string{"LICENSE", "GO-LICENSE.txt"} {
+		original, readErr := os.ReadFile(notice)
+		if readErr != nil {
+			return readErr
+		}
+		included, readErr := os.ReadFile(filepath.Join(packageRoot, notice))
+		if readErr != nil || !bytes.Equal(original, included) {
+			return fmt.Errorf("unpacked package license differs: %s", notice)
+		}
+	}
 	for _, check := range []struct {
 		args []string
 		want string

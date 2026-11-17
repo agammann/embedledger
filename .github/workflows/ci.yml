@@ -25,7 +25,7 @@ jobs:
       - uses: actions/checkout@3d3c42e5aac5ba805825da76410c181273ba90b1 # v7.0.1
       - uses: actions/setup-go@b7ad1dad31e06c5925ef5d2fc7ad053ef454303e # v7.0.0
         with:
-          go-version: '1.27.1'
+          go-version: '1.27.4'
           cache: false
       - name: Test real resolver and CLI workflows
         run: go test -count=1 ./...
@@ -57,7 +57,7 @@ jobs:
       - uses: actions/checkout@3d3c42e5aac5ba805825da76410c181273ba90b1 # v7.0.1
       - uses: actions/setup-go@b7ad1dad31e06c5925ef5d2fc7ad053ef454303e # v7.0.0
         with:
-          go-version: '1.27.1'
+          go-version: '1.27.4'
           cache: false
       - run: go test -race -count=1 ./...
 
@@ -70,7 +70,7 @@ jobs:
       - uses: actions/checkout@3d3c42e5aac5ba805825da76410c181273ba90b1 # v7.0.1
       - uses: actions/setup-go@b7ad1dad31e06c5925ef5d2fc7ad053ef454303e # v7.0.0
         with:
-          go-version: '1.27.1'
+          go-version: '1.27.4'
           cache: false
       - name: Download packages from this verified run
         uses: actions/download-artifact@9000827ccba6bdab643e8b6fd33ac0654aef8333 # v8.0.2
@@ -104,6 +104,8 @@ jobs:
           mkdir consumer
           unzip -q "embedledger_${version}_linux_amd64.zip" -d consumer
           cd "consumer/embedledger_${version}_linux_amd64"
+          cmp "$GITHUB_WORKSPACE/LICENSE" LICENSE
+          cmp "$GITHUB_WORKSPACE/GO-LICENSE.txt" GO-LICENSE.txt
           test "$(./embedledger version)" = "embedledger ${version}"
           ./embedledger check --goos linux --goarch amd64
       - name: Exercise the published-release guard without external writes

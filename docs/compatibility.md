@@ -16,18 +16,18 @@ Schema-1 baselines retain their field names and meanings. Version 1.x continues 
 
 A baseline comparison uses the recorded target OS, architecture, CGO setting, build tags, package selection, and test setting. Keep those options identical when saving and checking. The byte budget and timeout may differ. Go version is recorded as information and does not itself cause drift; Go's selected inputs can change between toolchains, so review any reported asset changes after a toolchain update.
 
-Go 1.27 or newer must remain on PATH even when using a prebuilt executable. Native packages contain the CLI, MIT license, README, changelog, documentation, and the example module. The package filenames identify the OS and architecture that actually built and ran the package checks. These packages do not bundle Go.
+Go 1.27 or newer must remain on PATH even when using a prebuilt executable. Native packages contain the CLI, application MIT license, Go runtime and standard library license notice, README, changelog, documentation, and the example module. The package filenames identify the OS and architecture that actually built and ran the package checks. These packages do not bundle the Go toolchain.
 
 ## Upgrade from 0.1.1
 
 Install the pinned source release:
 
 ```sh
-go install github.com/agammann/embedledger@v1.0.0
+go install github.com/agammann/embedledger@v1.0.1
 embedledger version
 ```
 
-The version output is `embedledger 1.0.0`. Alternatively, replace your previous executable with the verified native package for your OS and architecture.
+The version output is `embedledger 1.0.1`. Alternatively, replace your previous executable with the verified native package for your OS and architecture. The original 1.0.0 release established this compatibility contract; the 1.0.1 documentation and packaging patch keeps its commands and schema unchanged.
 
 Keep your reviewed `embedledger.json` and run `check` with the same options you used in 0.1.1:
 
@@ -44,10 +44,10 @@ Each ZIP has a matching `.zip.sha256` file. Compare its hash with the ZIP before
 On Windows PowerShell:
 
 ```powershell
-Get-FileHash .\embedledger_1.0.0_windows_amd64.zip -Algorithm SHA256
-Get-Content .\embedledger_1.0.0_windows_amd64.zip.sha256
+Get-FileHash .\embedledger_1.0.1_windows_amd64.zip -Algorithm SHA256
+Get-Content .\embedledger_1.0.1_windows_amd64.zip.sha256
 ```
 
 On Linux, run `sha256sum -c` with the checksum filename. On macOS, run `shasum -a 256 -c` with it. Use the package matching your architecture.
 
-After unpacking, use the CLI from the package directory or place it on PATH. Its included example baseline can be checked with `embedledger check --goos linux --goarch amd64`; this reports 112 bytes. In PowerShell, use `.\embedledger.exe` for the executable in the current directory. On macOS and Linux, use `./embedledger`.
+After unpacking, open a terminal in the package directory containing `go.mod`. Use `./embedledger check --goos linux --goarch amd64` on macOS or Linux, or `.\embedledger.exe check --goos linux --goarch amd64` in PowerShell. This checks the included example baseline and reports 112 bytes without adding the executable to PATH. See [native package troubleshooting](troubleshooting.md#native-zip-installation) for checking another module by explicit path.

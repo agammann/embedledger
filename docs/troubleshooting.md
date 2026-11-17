@@ -6,7 +6,9 @@
 
 First run `go version`. If Go is missing or older than 1.27, [install a supported toolchain](https://go.dev/doc/install) and reopen your terminal.
 
-If Go works but `embedledger` is missing after installation, add Go's executable installation directory to PATH. Go uses `GOBIN` when configured, otherwise the `bin` directory under the first `GOPATH` entry. These commands update only the current terminal session.
+For a native ZIP, follow [native ZIP installation](#native-zip-installation) below. Unpacking a ZIP does not add its executable to PATH.
+
+If Go works but `embedledger` is missing after `go install`, add Go's executable installation directory to PATH. Go uses `GOBIN` when configured, otherwise the `bin` directory under the first `GOPATH` entry. These commands update only the current terminal session.
 
 ### Windows PowerShell
 
@@ -37,6 +39,26 @@ embedledger version
 ```
 
 For future terminals, add the PATH configuration to your shell startup file. See Go's [installation directory guidance](https://go.dev/doc/tutorial/compile-install).
+
+## Native ZIP installation
+
+Open a terminal in the extracted package directory containing `go.mod`, `embedledger.json`, and the executable. Use `./embedledger` on macOS or Linux, or `.\embedledger.exe` in Windows PowerShell. A bare `embedledger` command works only when its directory is on PATH.
+
+The included module and example need no dependency downloads. Check the reviewed example from the package root:
+
+```sh
+./embedledger check --goos linux --goarch amd64
+```
+
+In PowerShell use `.\embedledger.exe check --goos linux --goarch amd64`. A match reports 112 bytes. Go 1.27 or newer must remain on PATH; the native package does not include Go.
+
+To check your own module while keeping the executable in its extracted directory, use its explicit path and `--dir`, for example on macOS or Linux:
+
+```sh
+/path/to/embedledger check --dir /path/to/your/module --goos linux --goarch amd64
+```
+
+In PowerShell, an executable path containing spaces needs the call operator, for example `& 'C:\Tools\EmbedLedger\embedledger.exe' check --dir 'C:\Projects\My module' --goos linux --goarch amd64`. Replace these example paths with your own. Prepare the module's dependencies and use its reviewed baseline and matching scope as described below.
 
 ## Module root or missing dependencies
 
