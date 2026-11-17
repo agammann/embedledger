@@ -12,6 +12,8 @@ The candidate uses Go 1.27.4 for builds and CI, retaining the Go 1.27 source min
 
 Browser-independent CLI verification of the actual candidate ZIP confirmed its checksum, paths, CRC and executable mode, then ran the copied native instructions and the same fictional workflow with Go 1.27.4. A module path containing spaces also worked with `--dir`. The candidate executable SHA256 was `a3fc9cb35bac15c130ba2fa4c8205c86ecd8a68a61837311500793519946131e`; later record-only documentation edits do not change that executable. Local Windows/macOS execution is not claimed. Exact-commit cross-platform CI, transferred packages and public release acceptance remain separate delivery evidence.
 
+Before publication, the native distribution was also updated to include the unchanged `LICENSE` from the Go 1.27.4 toolchain as `GO-LICENSE.txt` (SHA256 `911f8f5782931320f5b8d1160a76365b83aea6447ee6c04fa6d5591467db9dad`). This carries the upstream binary redistribution notice separately from the original application's MIT terms. Native packaging checks both extracted notices against source; the transferred Linux package check repeats that comparison. This is a distribution notice correction, not a legal certification or an application behavior change.
+
 ## Consumer installation review on October 2, 2026
 
 The documented `go install github.com/agammann/embedledger@v0.1.1` installation succeeded in a fresh Go workspace on Windows amd64. The executable reported `embedledger 0.1.1`. The official Go 1.27.1 archive was checked against the SHA256 published by go.dev before use.

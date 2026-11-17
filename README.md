@@ -152,4 +152,4 @@ Version 1.x preserves the documented commands, flags and defaults, exit codes, a
 
 ## License
 
-EmbedLedger is licensed under the [MIT License](LICENSE).
+EmbedLedger's original application code is licensed under the [MIT License](LICENSE). Native executables also include Go runtime and standard library code; their upstream [Go license notice](GO-LICENSE.txt) is included in each native ZIP alongside the application license.

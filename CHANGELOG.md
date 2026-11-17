@@ -6,6 +6,7 @@
 - Distinguish native ZIP invocation from `go install` PATH setup and document checking another module without adding the CLI to PATH.
 - Align current installation pins and the CI guide with this documentation and packaging patch. CLI behavior, defaults, exit codes and schema-1 baselines are unchanged.
 - Build and verify native packages with Go 1.27.4, incorporating the supported 1.27 toolchain's maintenance and security fixes. The source minimum remains Go 1.27.
+- Include the unchanged upstream Go runtime and standard library license notice alongside the application MIT license, and verify both notices after native packaging and artifact transfer.
 
 ## 1.0.0
 

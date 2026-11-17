@@ -16,7 +16,7 @@ Schema-1 baselines retain their field names and meanings. Version 1.x continues 
 
 A baseline comparison uses the recorded target OS, architecture, CGO setting, build tags, package selection, and test setting. Keep those options identical when saving and checking. The byte budget and timeout may differ. Go version is recorded as information and does not itself cause drift; Go's selected inputs can change between toolchains, so review any reported asset changes after a toolchain update.
 
-Go 1.27 or newer must remain on PATH even when using a prebuilt executable. Native packages contain the CLI, MIT license, README, changelog, documentation, and the example module. The package filenames identify the OS and architecture that actually built and ran the package checks. These packages do not bundle Go.
+Go 1.27 or newer must remain on PATH even when using a prebuilt executable. Native packages contain the CLI, application MIT license, Go runtime and standard library license notice, README, changelog, documentation, and the example module. The package filenames identify the OS and architecture that actually built and ran the package checks. These packages do not bundle the Go toolchain.
 
 ## Upgrade from 0.1.1
 

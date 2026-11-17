@@ -104,6 +104,8 @@ jobs:
           mkdir consumer
           unzip -q "embedledger_${version}_linux_amd64.zip" -d consumer
           cd "consumer/embedledger_${version}_linux_amd64"
+          cmp "$GITHUB_WORKSPACE/LICENSE" LICENSE
+          cmp "$GITHUB_WORKSPACE/GO-LICENSE.txt" GO-LICENSE.txt
           test "$(./embedledger version)" = "embedledger ${version}"
           ./embedledger check --goos linux --goarch amd64
       - name: Exercise the published-release guard without external writes
